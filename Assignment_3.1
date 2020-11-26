@@ -1,27 +1,13 @@
 ---
 title: "Assignment A3.1"
 author: "Kinga Mulik"
-date: "21 11 2020"
+date: "27 11 2020"
 output: html_document
 ---
 
-In this assignment, you are asked to provide an Exploratory Data Analysis of a dataset from the Lending Club dataset. The exploratory analysis should provide insights based on data visualizations from the dataset.
 
-You can access the dataset in the following link.  (Links to an external site.)
 
-Step1:
-
-Download the data from the platform. The data consists of the loan status of loans on the Lending Club platform.
-
-Step 2:
-
-Using your coding skills, provide the required data visualizations to explain the features that separate defaulted loans from the good loans (This will require you to make your own assumptions). The visualizations can be provided in Python, Java, Tableau or any other programming language or tool you are comfortable with. The data analysis should also help the viewer to understand the data from both files. For extra grade, try applying some machine learning models like Logistic regression or decision trees.
-
-Step3:
-
-Produce a ppt with all the data visualizations explained in slides.
-
-```{r}
+```{r setup, include=FALSE}
 library(data.table)
 library(testthat)
 library(gridExtra)
@@ -32,11 +18,11 @@ library(e1071)
 library(dplyr)
 library(tidyverse)
 library(ggplot2)
+library(ggthemes)
 ```
 
-
-```{r setup, include=FALSE}
-data <- read.csv("C:\\Users\\kinga\\OneDrive\\Pulpit\\Master_Loan_Summary.csv",
+```{r}
+data <- read.csv("C:\\Users\\kinga\\OneDrive\\Obrazy\\Pulpit\\Master_Loan_Summary.csv",
                header = TRUE)
 ```
 
@@ -47,156 +33,216 @@ summary(data)
 ```{r}
 head(data)
 ```
-what does this loan description mean? describe in ppt
-```{r}
-ggplot(data = data) +
-  geom_bar(mapping = aes(x = loan_status_description)) +
-  ggtitle("Loans by Status") +
-  xlab("Status") +
-  ylab("Number of Loans")
-```
-what is grade?? describe in ppt
-```{r}
-ggplot(data = data) +
-  geom_bar(mapping = aes(x = grade)) +
-  ggtitle("Loans by Grade") +
-  xlab("Grade") +
-  ylab("Number of Loans")
-```
+
 ```{r}
 dim(data)
 ```
-
 ```{r}
-str(data)
-```
-missing values
-```{r}
-colSums(sapply(data, is.na))
+na_table<-as.data.table(lapply(lapply(data,is.na),sum))
+na_table<-rbind(na_table,lapply(lapply(data,is.na),sum))
+na_table[2,]<-na_table[2,]*100/2875146
 ```
 
+```{r}
+data2 <- data
+```
+
+```{r}
+data2$loan_status_description <- as.factor(data2$loan_status_description)
+data2 <- data2[- grep("CURRENT", data2$loan_status_description),]
+dim(data2)
+```
+
+```{r}
+data2$loan_status_description[data2$loan_status_description == 'CHARGEOFF'] <- 'DEFAULTED'
+data2 <-data2 %>% mutate(default=ifelse(loan_status_description=="DEFAULTED",1,0))
+data2$default <- as.factor(data2$default)
+```
+```{r}
+summary(data2)
+```
+
+
+```{r}
+data2$amount_borrowed <- as.factor(data2$amount_borrowed)
+data2$installment <- as.numeric(data2$installment)
+data2$principal_paid <- as.numeric(data2$amount_borrowed)
+data2$term <- as.factor(data2$term)
+data2$borrower_rate <- as.factor(data2$borrower_rate)
+data2$grade <- as.factor(data2$grade)
+data2$origination_date <- as.Date(data2$origination_date)
+data2$listing_title <- as.factor(data2$listing_title)
+data2$principal_paid <- as.numeric(data2$principal_paid)
+data2$principal_balance <- as.numeric(data2$principal_balance)
+data2$interest_paid <- as.numeric(data2$interest_paid)
+data2$late_fees_paid <- as.numeric(data2$late_fees_paid)
+data2$debt_sale_proceeds_received <- as.numeric(data2$debt_sale_proceeds_received)
+data2$last_payment_date <- as.Date(data2$last_payment_date)
+data2$next_payment_due_date <- as.Date(data2$next_payment_due_date)
+data2$days_past_due <- as.factor(data2$days_past_due)
+data2$data_source <- as.factor(data2$data_source)
+```
+
+1,7,15,14,18,
+
+
+```{r}
+data2$default <- as.numeric(data2$default)
+numcol <- sapply(data2,is.numeric)
+pearsoncor <- cor(data2[numcol], use="complete.obs")
+corrplot(pearsoncor, "color")
+```
+
+```{r}
+data2$default <- as.factor(data2$default)
+```
+
+
+```{r}
+colSums(sapply(data2, is.na))
+```
 
 ```{r}
 sum(is.na(data)) / (nrow(data) *ncol(data))
 ```
 
+TARGET VARIABLE
+
 ```{r}
-# Check for duplicated rows.
-
-cat("The number of duplicated rows are", nrow(data) - nrow(unique(data)))
-```
-Barplots for the categorical features
-The bar plots below offer more insight into the data. MSZoning: bar plot indicates that majority of the houses are located in low density residential areas and medium density residential area.
-```{r}
-
-```
-
-Boxplot
-https://www.kaggle.com/notaapple/detailed-exploratory-data-analysis-in-r
-```{r}
-
-```
-
-https://bookdown.org/rdpeng/exdata/exploratory-graphs.html#characteristics-of-exploratory-graphs
-```{r}
-
-```
-
-https://www.kaggle.com/husainsb/lendingclub-analysis-and-predictions
-```{r}
-
+ggplot(data2, aes(x=default, fill=default)) + 
+  geom_bar() +
+  xlab("Defaulted") +
+  ylab("Count") +
+  labs(title='Analysis of Defaulted', subtitle='Histogram', x = 'Defaulted', y = 'Count') + 
+  scale_fill_discrete(name = "Defaulted", labels = c("Not defaulted", "Defaulted")) + theme_stata() + scale_color_stata()
 ```
 
 
-
-
-
 ```{r}
-library(corrplot)
-corrplot(data, method="color")
-```
-dodac do tej csvki nowa kolumne z TRUE or FALSE (true jesli default, false jesli nie), wtedy zrobi corrplot (correlation matrix tej above)
-```{r}
-
-```
-
-skategoryzowac amount_borrowed i wyswietlic w jakich przedzialach ludziep ozyczaja hajsik
-```{r}
-
-```
-
-status vs amount_borrowed
-```{r}
-
-```
-
-listing_title plot
-```{r}
-
-```
-
-wartosc late_fees_paid vs status (default)
-```{r}
-
-```
-
-last_payment_date -> przerobic tak, zeby wyswietalo kategorie (ostatnia wplata w ciagu ostatnich 10 dni, 30 dni, 90 dni, ponad 90 dni)
-```{r}
-
-```
-
-ten wyzej przerobiony wskaznik plot vs status
-```{r}
-
-```
-
-```{r}
-
-```
-
-```{r}
-
-```
-
-```{r}
-
-```
-
-```{r}
-
-```
-
-```{r}
-
-```
-
-```{r}
-
-```
-
-```{r}
-
-```
-
-```{r}
-
-```
-
-```{r}
-
-```
-
-```{r}
-
-```
-
-```{r}
-
-```
-
-Machine learning model - divide into train/test sets and make some decision tree
-```{r}
-
+ggplot(data = data2) +
+  geom_bar(mapping = aes(x = loan_status_description)) +
+  ggtitle("Loans by Status") +
+  xlab("Status") +
+  ylab("Number of Loans") + theme_stata() + scale_color_stata()
 ```
 
 
+```{r}
+data3 <-data2 %>% mutate(default=ifelse(loan_status_description=="DEFAULTED",1,0))
+data3$default <- as.factor(data3$default)
+```
+
+```{r}
+summary(data3)
+```
+
+grade
+```{r}
+ggplot(data = data3) +
+  geom_bar(mapping = aes(x = grade)) +
+  ggtitle("Loans by Grade") +
+  xlab("Grade") +
+  ylab("Number of Loans") + theme_stata() + scale_color_stata()
+```
+
+loan_status_description
+```{r}
+ggplot(data = data3) +
+  geom_bar(mapping = aes(x = loan_status_description)) +
+  ggtitle("Loans by Status") +
+  xlab("Status") +
+  ylab("Number of Loans") + theme_stata() + scale_color_stata()
+```
+
+listing_title
+```{r}
+ggplot(data = data3) +
+  geom_bar(mapping = aes(x = listing_title)) +
+  ggtitle("Loans by Listing Title") +
+  xlab("Listing Title") +
+  ylab("Number of Loans") +
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1)) + theme_stata() + scale_color_stata()
+```
+
+term
+```{r}
+ggplot(data = data3) +
+  geom_bar(mapping = aes(x = term)) +
+  ggtitle("Loans by Term") +
+  xlab("Terms") +
+  ylab("Number of Loans in each Terms") +
+  theme_stata() + scale_color_stata()
+```
+
+data source
+```{r}
+ggplot(data = data3) +
+  geom_bar(mapping = aes(x = data_source)) +
+  ggtitle("Loans by Source") +
+  xlab("Data Source") +
+  ylab("Number of Loans from Data Source") +
+  theme_stata() + scale_color_stata()
+```
+
+
+
+
+term vs defaulted
+
+```{r}
+ggplot(data3, aes(x=term, fill=default)) + 
+  geom_bar() +
+  xlab("Term Type") +
+  ylab("Count") + scale_fill_discrete(name = "Default", labels = c("1", "0"))
+```
+
+
+```{r}
+ggplot(data3, aes(x= listing_title, fill=default)) + 
+  geom_bar() +
+  xlab("Listing Title") +
+  ylab("Count") +
+  scale_fill_discrete(name = "Default", labels = c("1", "0"))
+```
+
+
+```{r}
+data3$days_past_due <- as.numeric(data3$days_past_due)
+data3 %>%
+  ggplot(aes(x=days_past_due,fill=default, stat="count"))+
+  geom_histogram() +
+  xlab("Days Past Due") + 
+  ylab("Count")+
+  scale_fill_discrete(name = "Default", labels = c("1", "0")) +
+  labs(title='Default by Days')  
+```
+
+```{r}
+head(data3)
+```
+```{r}
+data4 = data3[,-c(7,14,15)]
+```
+
+```{r}
+data4 = data4[,-c(1)]
+```
+```{r}
+head(data4)
+```
+```{r}
+data4$amount_borrowed <- as.factor(data4$amount_borrowed)
+data4$installment <- as.numeric(data4$installment)
+data4$principal_paid <- as.numeric(data4$amount_borrowed)
+data4$term <- as.factor(data4$term)
+data4$borrower_rate <- as.factor(data4$borrower_rate)
+data4$grade <- as.factor(data4$grade)
+data4$listing_title <- as.factor(data4$listing_title)
+data4$principal_paid <- as.numeric(data4$principal_paid)
+data4$principal_balance <- as.numeric(data4$principal_balance)
+data4$interest_paid <- as.numeric(data4$interest_paid)
+data4$late_fees_paid <- as.numeric(data4$late_fees_paid)
+data4$debt_sale_proceeds_received <- as.numeric(data4$debt_sale_proceeds_received)
+data4$days_past_due <- as.factor(data4$days_past_due)
+data4$data_source <- as.factor(data4$data_source)
+```
