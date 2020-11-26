@@ -1,0 +1,202 @@
+---
+title: "Assignment A3.1"
+author: "Kinga Mulik"
+date: "21 11 2020"
+output: html_document
+---
+
+In this assignment, you are asked to provide an Exploratory Data Analysis of a dataset from the Lending Club dataset. The exploratory analysis should provide insights based on data visualizations from the dataset.
+
+You can access the dataset in the following link.  (Links to an external site.)
+
+Step1:
+
+Download the data from the platform. The data consists of the loan status of loans on the Lending Club platform.
+
+Step 2:
+
+Using your coding skills, provide the required data visualizations to explain the features that separate defaulted loans from the good loans (This will require you to make your own assumptions). The visualizations can be provided in Python, Java, Tableau or any other programming language or tool you are comfortable with. The data analysis should also help the viewer to understand the data from both files. For extra grade, try applying some machine learning models like Logistic regression or decision trees.
+
+Step3:
+
+Produce a ppt with all the data visualizations explained in slides.
+
+```{r}
+library(data.table)
+library(testthat)
+library(gridExtra)
+library(corrplot)
+library(GGally)
+library(ggplot2)
+library(e1071)
+library(dplyr)
+library(tidyverse)
+library(ggplot2)
+```
+
+
+```{r setup, include=FALSE}
+data <- read.csv("C:\\Users\\kinga\\OneDrive\\Pulpit\\Master_Loan_Summary.csv",
+               header = TRUE)
+```
+
+```{r}
+summary(data)
+```
+
+```{r}
+head(data)
+```
+what does this loan description mean? describe in ppt
+```{r}
+ggplot(data = data) +
+  geom_bar(mapping = aes(x = loan_status_description)) +
+  ggtitle("Loans by Status") +
+  xlab("Status") +
+  ylab("Number of Loans")
+```
+what is grade?? describe in ppt
+```{r}
+ggplot(data = data) +
+  geom_bar(mapping = aes(x = grade)) +
+  ggtitle("Loans by Grade") +
+  xlab("Grade") +
+  ylab("Number of Loans")
+```
+```{r}
+dim(data)
+```
+
+```{r}
+str(data)
+```
+missing values
+```{r}
+colSums(sapply(data, is.na))
+```
+
+
+```{r}
+sum(is.na(data)) / (nrow(data) *ncol(data))
+```
+
+```{r}
+# Check for duplicated rows.
+
+cat("The number of duplicated rows are", nrow(data) - nrow(unique(data)))
+```
+Barplots for the categorical features
+The bar plots below offer more insight into the data. MSZoning: bar plot indicates that majority of the houses are located in low density residential areas and medium density residential area.
+```{r}
+
+```
+
+Boxplot
+https://www.kaggle.com/notaapple/detailed-exploratory-data-analysis-in-r
+```{r}
+
+```
+
+https://bookdown.org/rdpeng/exdata/exploratory-graphs.html#characteristics-of-exploratory-graphs
+```{r}
+
+```
+
+https://www.kaggle.com/husainsb/lendingclub-analysis-and-predictions
+```{r}
+
+```
+
+
+
+
+
+```{r}
+library(corrplot)
+corrplot(data, method="color")
+```
+dodac do tej csvki nowa kolumne z TRUE or FALSE (true jesli default, false jesli nie), wtedy zrobi corrplot (correlation matrix tej above)
+```{r}
+
+```
+
+skategoryzowac amount_borrowed i wyswietlic w jakich przedzialach ludziep ozyczaja hajsik
+```{r}
+
+```
+
+status vs amount_borrowed
+```{r}
+
+```
+
+listing_title plot
+```{r}
+
+```
+
+wartosc late_fees_paid vs status (default)
+```{r}
+
+```
+
+last_payment_date -> przerobic tak, zeby wyswietalo kategorie (ostatnia wplata w ciagu ostatnich 10 dni, 30 dni, 90 dni, ponad 90 dni)
+```{r}
+
+```
+
+ten wyzej przerobiony wskaznik plot vs status
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+Machine learning model - divide into train/test sets and make some decision tree
+```{r}
+
+```
+
+
